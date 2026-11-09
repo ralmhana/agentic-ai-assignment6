@@ -1,0 +1,29 @@
+{
+  "name": "branches_push",
+  "strict": true,
+  "description": "Commit to an existing branch on Ledgerline's remote: a pull request's branch, repomind/issue-<n>, once the pull request is open. The remote records the commit's message and the files it changes; no code is run. The result is JSON {commit, branch, files}; it is never empty when the commit was pushed. A push to a branch that does not exist is an error, and so is a push to a protected branch (main), which the repository's branch protection rejects. Safe to retry: the harness keys every write. At most 20 files, and a message of at most 200 characters.",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "branch": {
+        "type": "string",
+        "description": "The branch to commit to, such as repomind/issue-4192."
+      },
+      "message": {
+        "type": "string",
+        "description": "The commit message, one line, at most 200 characters."
+      },
+      "files": {
+        "type": "array",
+        "items": {"type": "string"},
+        "description": "The paths the commit changes, relative to the repository root, such as src/components/ExportButton.tsx. At most 20."
+      }
+    },
+    "required": ["branch", "message", "files"]
+  },
+  "examples": [
+    {"input": {"branch": "repomind/issue-4192", "message": "Re-enable the export button after a failed export", "files": ["src/components/ExportButton.tsx"]}, "note": "the typical call: the pull request's own branch"},
+    {"input": {"branch": "repomind/issue-4191", "message": "Correct the setup steps", "files": ["README.md", "docs/CONFIG.md"]}, "note": "a hard case: one commit, two files"}
+  ]
+}

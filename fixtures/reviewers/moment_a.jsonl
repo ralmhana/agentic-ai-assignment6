@@ -1,0 +1,2 @@
+{"kind": "escalation", "decision": "deny"}
+{"action_class": "*", "decision": "approve", "repeat": true}

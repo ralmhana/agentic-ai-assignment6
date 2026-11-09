@@ -1,0 +1,7 @@
+# Assignment 6's task one-4409: RepoMind's daily task on one issue.
+# For measurement: tune nothing on it (checks/FORMATS.md, section 14.1).
+id: one-4409
+kind: single
+issues: [4409]
+answers:
+  4409: {label: docs, file: README.md}

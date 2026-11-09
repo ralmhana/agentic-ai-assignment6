@@ -1,0 +1,11 @@
+# Assignment 6's task batch-b: RepoMind's daily task on five unrelated issues, in one run.
+# For measurement: tune nothing on it (checks/FORMATS.md, section 14.1).
+id: batch-b
+kind: batch
+issues: [4424, 4426, 4429, 4431, 4434]
+answers:
+  4424: {label: bug, file: src/exportUtils.ts}
+  4426: {label: question, file: none}
+  4429: {label: bug, file: src/api/reports.ts}
+  4431: {label: feature, file: src/util/strings.ts}
+  4434: {label: bug, file: src/components/UploadForm.tsx}

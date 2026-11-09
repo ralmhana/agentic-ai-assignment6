@@ -1,0 +1,11 @@
+{"run_id": "split-batch-waits-nocycle", "t": 0.0, "type": "run_start", "lab": "06", "way": "split", "task": "recorded-waits", "kind": "batch", "recorded": true, "note": "Recorded for Assignment 6, Part B: waits that never form a cycle."}
+{"run_id": "split-batch-waits-nocycle", "t": 0.2, "type": "wait", "agent": "coordinator", "parent": null, "waiter": "coordinator", "on": "investigator-1", "what": "a finding", "turn": 0}
+{"run_id": "split-batch-waits-nocycle", "t": 0.6, "type": "wait", "agent": "coordinator", "parent": null, "waiter": "coordinator", "on": "investigator-2", "what": "a finding", "turn": 0}
+{"run_id": "split-batch-waits-nocycle", "t": 1.0, "type": "wait", "agent": "coordinator", "parent": null, "waiter": "coordinator", "on": "investigator-3", "what": "a finding", "turn": 0}
+{"run_id": "split-batch-waits-nocycle", "t": 1.4, "type": "wait", "agent": "writer-1", "parent": "coordinator", "waiter": "writer-1", "on": "investigator-1", "what": "the finding it writes from", "turn": 1}
+{"run_id": "split-batch-waits-nocycle", "t": 1.8, "type": "wait", "agent": "writer-2", "parent": "coordinator", "waiter": "writer-2", "on": "investigator-2", "what": "the finding it writes from", "turn": 1}
+{"run_id": "split-batch-waits-nocycle", "t": 2.2, "type": "wait", "agent": "coordinator", "parent": null, "waiter": "coordinator", "on": "writer-1", "what": "the comment", "turn": 2}
+{"run_id": "split-batch-waits-nocycle", "t": 2.6, "type": "wait", "agent": "coordinator", "parent": null, "waiter": "coordinator", "on": "writer-2", "what": "the comment", "turn": 2}
+{"run_id": "split-batch-waits-nocycle", "t": 3.0, "type": "wait", "agent": "writer-3", "parent": "coordinator", "waiter": "writer-3", "on": "investigator-3", "what": "the finding it writes from", "turn": 2}
+{"run_id": "split-batch-waits-nocycle", "t": 3.4, "type": "wait", "agent": "coordinator", "parent": null, "waiter": "coordinator", "on": "writer-3", "what": "the comment", "turn": 3}
+{"run_id": "split-batch-waits-nocycle", "t": 4.0, "type": "end", "terminal_reason": "completed", "detail": "recorded"}

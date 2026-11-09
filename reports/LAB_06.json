@@ -1,0 +1,23 @@
+{
+  "gates": {"daily": [null, null, null, null], "batch": [null, null, null, null]},
+  "constants": {"model": null, "schemas_sha": null, "checks_sha": null, "reviewer": null, "task_ids": []},
+  "arms": {
+    "S": {"single": {"runs": 0, "passes": 0, "per_task": {}, "sweep_min": null, "sweep_max": null, "all_three": 0,
+                     "mean_tokens": null, "mean_wall_s": null},
+          "batch": {"runs": 0, "passes": 0, "per_task": {}, "sweep_min": null, "sweep_max": null, "all_three": 0,
+                    "mean_tokens": null, "mean_wall_s": null}},
+    "M": {"single": {"runs": 0, "passes": 0, "per_task": {}, "sweep_min": null, "sweep_max": null, "all_three": 0,
+                     "mean_tokens": null, "mean_wall_s": null},
+          "batch": {"runs": 0, "passes": 0, "per_task": {}, "sweep_min": null, "sweep_max": null, "all_three": 0,
+                    "mean_tokens": null, "mean_wall_s": null}},
+    "S_plus": {"single": {"runs": 0, "passes": 0, "per_task": {}, "sweep_min": null, "sweep_max": null, "all_three": 0,
+                          "mean_tokens": null, "mean_wall_s": null},
+               "batch": {"runs": 0, "passes": 0, "per_task": {}, "sweep_min": null, "sweep_max": null, "all_three": 0,
+                         "mean_tokens": null, "mean_wall_s": null}}
+  },
+  "multiplier": {"single": null, "batch": null},
+  "spend_check": {"single": {"spent_more": null, "spend_raises_score": null, "one_agent_as_well": null},
+                  "batch": {"spent_more": null, "spend_raises_score": null, "one_agent_as_well": null}},
+  "failures": [],
+  "decision": {"single": null, "batch": null, "revisit_condition": null}
+}

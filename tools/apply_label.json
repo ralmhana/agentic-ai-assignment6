@@ -1,0 +1,24 @@
+{
+  "name": "issues_label",
+  "strict": true,
+  "description": "Add one label to one issue on Ledgerline's tracker. RepoMind applies its triage label (bug, feature, question or docs), the same label its comment states. The result is JSON {label, issue, applied}; it is never empty when the label was added. Safe to retry: the harness keys every write, so a repeat returns the label already there. A label is at most 40 characters: lower-case letters, digits, and - _ / only.",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "issue": {
+        "type": "string",
+        "description": "The issue to label, such as issue-4192."
+      },
+      "label": {
+        "type": "string",
+        "description": "One label, such as bug. At most 40 characters."
+      }
+    },
+    "required": ["issue", "label"]
+  },
+  "examples": [
+    {"input": {"issue": "issue-4192", "label": "bug"}, "note": "the typical call: the triage label"},
+    {"input": {"issue": "issue-4191", "label": "docs"}, "note": "a hard case: a documentation issue gets docs, not bug, even when something is broken"}
+  ]
+}

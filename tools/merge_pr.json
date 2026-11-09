@@ -1,0 +1,20 @@
+{
+  "name": "pulls_merge",
+  "strict": true,
+  "description": "Merge one open pull request on Ledgerline's remote into its base branch (develop). The result is JSON {pull_request, merged, base}; it is never empty when the merge happened. A pull request that is not open, or that this run did not open, is an error. Safe to retry: the harness keys every write. Nothing undoes a merge.",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "pr": {
+        "type": "string",
+        "description": "The pull request, as its opening returned it, such as pr-12."
+      }
+    },
+    "required": ["pr"]
+  },
+  "examples": [
+    {"input": {"pr": "pr-12"}, "note": "the typical call"},
+    {"input": {"pr": "pr-3"}, "note": "a hard case: the pull request this run opened, as pulls_open returned it, not the issue's number"}
+  ]
+}

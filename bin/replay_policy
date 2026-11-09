@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+"""Replay a recorded day through the policy: bin/replay_policy FILE [--batched] [--json].
+Assignment 5's working solution.
+
+Every line of FILE (fixtures/rollup_2026-08-04.jsonl) is placed by policy/hook.py's
+own classify(), the code the hook runs on a live call, from the line's facts. It
+prints, per column, how many calls land there by action class, then the reviewer's
+budget: one engineer, ten minutes a day, so 600 seconds over the prompts per day
+(Lecture 5, slide 28).
+
+--batched puts the plan review in place (slide 18): the reviewer approves a run's
+plan once, and that one review covers every call in the run whose class is in
+COVERS. A run with any covered call costs one prompt, whatever the number of its
+covered calls; the uncovered gated calls still prompt one each. The recorded day
+has no plan revisions, and each revision of a plan with a covered step would cross
+the gate again, so the batched count is a floor.
+"""
+
+import json
+import sys
+from collections import Counter, defaultdict
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from harness.formats import COLUMNS  # noqa: E402
+from policy.hook import classify, policy  # noqa: E402
+
+BUDGET_S = 600
+COVERS = ["open_pr", "post_comment/human_active", "push_commit/unprotected"]
+
+
+def replay(path: Path, batched: bool = False) -> dict:
+    placed = policy()
+    counts = {c: Counter() for c in COLUMNS}
+    gated_by_run = defaultdict(list)
+    for line in Path(path).read_text().splitlines():
+        if not line.strip():
+            continue
+        call = json.loads(line)
+        klass, column = classify(call["action"], call.get("facts") or {}, placed)
+        counts[column][klass] += 1
+        if column == "requires_approval":
+            gated_by_run[call["run_id"]].append(klass)
+    prompts = sum(counts["requires_approval"].values())
+    out = {c: dict(sorted(counts[c].items())) for c in COLUMNS}
+    if batched:
+        prompts = sum((1 if any(k in COVERS for k in ks) else 0) + sum(1 for k in ks if k not in COVERS)
+                      for ks in gated_by_run.values())
+        out["covers"] = COVERS
+    out["prompts_per_day"] = prompts
+    out["seconds_per_prompt"] = round(BUDGET_S / prompts, 1) if prompts else None
+    return out
+
+
+def main(argv) -> int:
+    args = [a for a in argv if not a.startswith("--")]
+    if len(args) != 1:
+        print(__doc__)
+        return 2
+    out = replay(Path(args[0]), batched="--batched" in argv)
+    if "--json" in argv:
+        print(json.dumps(out))
+        return 0
+    for column in COLUMNS:
+        print(f"{column}: {sum(out[column].values())}")
+        for klass, n in out[column].items():
+            print(f"    {klass:<28} {n:>4}")
+    plan = " with one plan review covering " + ", ".join(COVERS) if "--batched" in argv else ""
+    print(f"prompts per day{plan}: {out['prompts_per_day']}; seconds per prompt at ten minutes a day: "
+          f"{out['seconds_per_prompt']}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

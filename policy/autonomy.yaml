@@ -1,0 +1,53 @@
+# RepoMind's autonomy policy: Assignment 5's working solution.
+#
+# Lecture 5, slide 51's policy, placed by consequence (slides 13 and 14) and kept
+# outside the model: policy/hook.py reads this file before every call, and the model
+# never sees it. Every action is placed; two are split by circumstance, as slide 51
+# splits them, and post_comment has a third circumstance slide 51 never names (a
+# quiet thread a person opened), placed independent: nobody is mid-conversation, the
+# reporter asked for exactly this triage, and the comment is RepoMind's whole job.
+
+independent:
+  - read_issue
+  - search_repo
+  - read_file
+  - run_tests
+  - apply_label
+  - close_issue
+  - post_comment/agent_opened
+  - post_comment/quiet
+
+requires_approval:
+  - post_comment/human_active
+  - open_pr
+  - push_commit/unprotected
+
+prohibited:
+  - merge_pr
+  - push_commit/protected
+
+classes:
+  post_comment/human_active: a person commented on the thread within the last 60 minutes (minutes_since_human_comment)
+  post_comment/agent_opened: RepoMind opened the issue (issue_opened_by_agent) and no person commented within the hour
+  post_comment/quiet: a person opened the issue and nobody commented within the hour
+  push_commit/protected: the branch is protected (branch_protected), which on Ledgerline is main
+  push_commit/unprotected: any other branch, such as a pull request's own
+
+escalate:
+  - before an irreversible or gated write (post_comment, open_pr, push_commit, merge_pr), when the run has raised a named signal
+  - signals, set by the harness: a failed verification (run_tests did not pass), a contradiction with stored memory, a tool result it cannot interpret, the same step refused or failed three times
+  - never on the model's stated confidence
+
+# How long a gated call or an escalation waits for an answer before the run holds.
+timeouts:
+  approval_s: 1800
+  escalation_s: 3600
+
+# Escalations per day that reach the reviewer. They share the ten minutes a day with
+# the approvals: 15 prompts at 40 seconds leave none spare, so each escalation is
+# taken from the same budget, and five is where the reviewer's day is gone. A capped
+# escalation still holds.
+escalations_per_day: 5
+
+# Lecture 5, slide 43: strangers read RepoMind's comments, so each one says who wrote it.
+disclosure: "This comment was written by RepoMind, an automated triage agent. To reach a person, mention @ledgerline/maintainers."

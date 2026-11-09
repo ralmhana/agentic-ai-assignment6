@@ -1,0 +1,81 @@
+{
+  "task": {
+    "id": "recorded-batch",
+    "kind": "batch",
+    "issues": [
+      4410,
+      4412,
+      4414,
+      4420,
+      4423
+    ]
+  },
+  "end_state": {
+    "4410": {
+      "comments": [
+        "label: bug\nfile: src/config.ts\nThis comment was written by RepoMind, an automated triage agent. To reach a person, mention @ledgerline/maintainers.\n\nTriage by RepoMind."
+      ],
+      "labels": [
+        "bug"
+      ],
+      "prs": [
+        {
+          "title": "Fix the cause of issue 4410",
+          "body": "File: src/config.ts\n\nChange the code there."
+        }
+      ]
+    },
+    "4412": {
+      "comments": [
+        "label: question\nfile: none\nThis comment was written by RepoMind, an automated triage agent. To reach a person, mention @ledgerline/maintainers.\n\nTriage by RepoMind."
+      ],
+      "labels": [
+        "question"
+      ],
+      "prs": []
+    },
+    "4414": {
+      "comments": [
+        "label: feature\nfile: src/api/reports.ts\nThis comment was written by RepoMind, an automated triage agent. To reach a person, mention @ledgerline/maintainers.\n\nTriage by RepoMind."
+      ],
+      "labels": [
+        "feature"
+      ],
+      "prs": [
+        {
+          "title": "Fix the cause of issue 4414",
+          "body": "File: src/export/csv.ts\n\nChange the code there."
+        }
+      ]
+    },
+    "4420": {
+      "comments": [
+        "label: docs\nfile: docs/API.md\nThis comment was written by RepoMind, an automated triage agent. To reach a person, mention @ledgerline/maintainers.\n\nTriage by RepoMind."
+      ],
+      "labels": [
+        "docs"
+      ],
+      "prs": [
+        {
+          "title": "Fix the cause of issue 4420",
+          "body": "File: docs/API.md\n\nChange the code there."
+        }
+      ]
+    },
+    "4423": {
+      "comments": [
+        "label: bug\nfile: src/i18n/index.ts\nThis comment was written by RepoMind, an automated triage agent. To reach a person, mention @ledgerline/maintainers.\n\nTriage by RepoMind."
+      ],
+      "labels": [
+        "bug"
+      ],
+      "prs": [
+        {
+          "title": "Fix the cause of issue 4423",
+          "body": "File: src/i18n/index.ts\n\nChange the code there."
+        }
+      ]
+    }
+  },
+  "note": "Recorded for Assignment 6, Part B: every worker reported success, and the combined result is wrong."
+}

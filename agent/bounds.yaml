@@ -1,0 +1,5 @@
+# Assignment 1's bounds, each with its reason. In Assignment 6, max_tokens is B,
+# the single agent's token budget per issue (the handout, Part C, task 2).
+max_steps: 12          # the task needs read, two or three searches, a comment and a stop; 12 leaves room and caps the worst case
+max_tokens: 250000     # about the worst case at 12 steps with a large repository result per step; below the harness's 1,500,000 per run
+wall_clock_s: 180      # three minutes: past this a triage comment is no longer interactive

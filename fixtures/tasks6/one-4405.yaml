@@ -1,0 +1,7 @@
+# Assignment 6's task one-4405: RepoMind's daily task on one issue.
+# For measurement: tune nothing on it (checks/FORMATS.md, section 14.1).
+id: one-4405
+kind: single
+issues: [4405]
+answers:
+  4405: {label: feature, file: src/components/ExportButton.tsx}

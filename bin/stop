@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+"""Stop a live run: bin/stop <run_id>. Assignment 5's working solution.
+
+The run's live notification (logs/notifications.jsonl) names its run_id. From the
+next call on, the hook refuses every call of that run, and the run saves a checkpoint
+and ends stopped. `python run.py --resume <run_id>` lifts the stop and goes on.
+"""
+
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from policy import stop  # noqa: E402
+
+
+def main(argv) -> int:
+    if len(argv) != 1:
+        print(__doc__)
+        return 2
+    run_id = argv[0]
+    if stop.requested(run_id):
+        print(f"{run_id} is already stopped")
+        return 0
+    line = stop.request(run_id)
+    print(f"stop requested for {run_id} at {line['at']}; it takes effect at the run's next call")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

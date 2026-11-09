@@ -1,0 +1,111 @@
+#!/usr/bin/env python3
+"""The reviewer console. Run it in a second terminal while a run uses REVIEWER=human:
+
+    bin/review              # waits for requests, shows each one, records your answer
+    bin/review --once       # answers what is waiting now, then exits
+
+It shows each waiting request, oldest first, through your screen: render(request)
+in policy/screen.py, which returns the text to show (Part B; the request's fields
+are in checks/FORMATS.md, section 13.4). Until that file exists, or when it raises,
+the console shows the request as JSON and says why. It is plain on purpose: the
+screen is yours to design.
+
+Type a to approve, d to deny, or s to skip one for now. The time from when the
+screen appears to your answer is the answer's `seconds`. A request the run stopped
+waiting for (its timeout passed) disappears from the queue.
+"""
+
+from __future__ import annotations
+
+import argparse
+import importlib
+import json
+import sys
+import time
+import traceback
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from harness.clock import now  # noqa: E402
+from harness.reviewer import Reviewer  # noqa: E402
+
+RULE = "─" * 72
+
+
+def screen(request: dict) -> str:
+    try:
+        module = importlib.import_module("policy.screen")
+        importlib.reload(module)                  # pick up your edits without restarting the console
+        text = module.render(request)
+        if not isinstance(text, str) or not text.strip():
+            raise ValueError("render() returned no text")
+        return text
+    except Exception as exc:  # the console must keep working while the screen is being written
+        why = (f"policy/screen.py is not written yet" if isinstance(exc, ModuleNotFoundError)
+               else f"policy/screen.py failed: {type(exc).__name__}: {exc}")
+        shown = {k: v for k, v in request.items() if k not in ("asked_at",)}
+        return f"[{why}; the request as JSON]\n" + json.dumps(shown, indent=2, default=str)
+
+
+def answer(reviewer: Reviewer, request: dict) -> bool:
+    """Show one request and record the answer. False when it was skipped or withdrawn."""
+    print(f"\n{RULE}\n{request.get('kind', 'approval').upper()} {request['request_id']}  ·  run {request['run_id']}"
+          f"  ·  waiting since {request.get('asked_at', '?')}\n{RULE}")
+    print(screen(request))
+    print(RULE)
+    shown_at = now()
+    while True:
+        try:
+            choice = input("a approve · d deny · s skip > ").strip().lower()
+        except EOFError:
+            return False
+        if choice in ("a", "d", "s"):
+            break
+    pending = ROOT / "logs" / "review" / "pending" / f"{request['request_id']}.json"
+    if choice == "s":
+        return False
+    if not pending.exists():
+        print("  the run stopped waiting for this one (its timeout passed); nothing was recorded")
+        return False
+    reviewer.decide(request["request_id"], "approve" if choice == "a" else "deny", shown_at)
+    print(f"  recorded: {'approve' if choice == 'a' else 'deny'}")
+    return True
+
+
+def main(argv=None) -> int:
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--once", action="store_true", help="answer what is waiting now, then exit")
+    a = p.parse_args(argv)
+    reviewer = Reviewer("human", ROOT)
+    skipped: set[str] = set()
+    said_waiting = False
+    try:
+        while True:
+            queue = [r for r in reviewer.pending() if r["request_id"] not in skipped]
+            if not queue:
+                if a.once:
+                    print("nothing is waiting")
+                    return 0
+                if not said_waiting:
+                    print("waiting for requests (Ctrl-C to quit) ...")
+                    said_waiting = True
+                time.sleep(0.5)
+                continue
+            said_waiting = False
+            for request in queue:
+                if not answer(reviewer, request):
+                    skipped.add(request["request_id"])
+            if a.once:
+                return 0
+    except KeyboardInterrupt:
+        print()
+        return 0
+    except Exception:
+        traceback.print_exc()
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

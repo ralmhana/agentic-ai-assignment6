@@ -1,0 +1,20 @@
+{
+  "name": "code_run_tests",
+  "strict": true,
+  "description": "Run Ledgerline's test suite, fixtures/repo/test/, on one branch of the remote, and report the result. It changes nothing. The result is JSON {ref, passed, tests, failed}: passed is true when no test failed, and failed lists the failing tests' names; an empty failed list means every test passed. At most 50 names are listed.",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "ref": {
+        "type": "string",
+        "description": "The branch to test: main, develop, or a pull request's branch such as repomind/issue-4192."
+      }
+    },
+    "required": ["ref"]
+  },
+  "examples": [
+    {"input": {"ref": "repomind/issue-4192"}, "note": "the typical call: the branch of the pull request this run opened"},
+    {"input": {"ref": "develop"}, "note": "a hard case: the base, to tell a failure the change brought from one already there"}
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "issues_close",
+  "strict": true,
+  "description": "Close one issue on Ledgerline's tracker, with the reason stated for the people who read it. The result is JSON {issue, closed, reason}; it is never empty when the issue was closed. Safe to retry: the harness keys every write, so a repeat returns the close already made. The reason is at most 300 characters.",
+  "input_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "issue": {
+        "type": "string",
+        "description": "The issue to close, such as issue-4192."
+      },
+      "reason": {
+        "type": "string",
+        "description": "Why it is closed, in one sentence, such as: Duplicate of issue-4188, which tracks the same failure. At most 300 characters."
+      }
+    },
+    "required": ["issue", "reason"]
+  },
+  "examples": [
+    {"input": {"issue": "issue-4192", "reason": "Duplicate of issue-4188, which tracks the same failure."}, "note": "the typical call: a duplicate"},
+    {"input": {"issue": "issue-4191", "reason": "Fixed in the README on develop; the setup steps now name npm run dev."}, "note": "a hard case: say where the fix is, so a reader can check it"}
+  ]
+}

@@ -1,0 +1,7 @@
+# Assignment 6's task one-4413: RepoMind's daily task on one issue.
+# For measurement: tune nothing on it (checks/FORMATS.md, section 14.1).
+id: one-4413
+kind: single
+issues: [4413]
+answers:
+  4413: {label: bug, file: src/components/Toast.tsx}

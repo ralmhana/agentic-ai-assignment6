@@ -1,0 +1,7 @@
+# Assignment 6's task one-4406: RepoMind's daily task on one issue.
+# For measurement: tune nothing on it (checks/FORMATS.md, section 14.1).
+id: one-4406
+kind: single
+issues: [4406]
+answers:
+  4406: {label: bug, file: src/ingest/parser.ts}

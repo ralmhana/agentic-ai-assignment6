@@ -1,0 +1,10 @@
+# The result of Ledgerline's test suite (fixtures/repo/test/) on each branch of the
+# mock remote, which runs no code: tools/run_tests.py reads it. A branch not listed
+# passes every test. Course file: do not edit it.
+#
+# repomind/issue-4501 is moment A's branch (fixtures/issues/moments/4501.md): its
+# change to the CSV writer moves a column, and one test catches it.
+branches:
+  repomind/issue-4501:
+    failed:
+      - "toDelimited > puts date first (3.2.0 column order)"
