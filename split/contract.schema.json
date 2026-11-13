@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "result": {"type": "object", "additionalProperties": false,
+      "properties": {"issue": {"type": "integer"}, "label": {"type": "string"}, "file": {"type": "string"}, "evidence": {"type": "string"}},
+      "required": ["issue", "label", "file", "evidence"]},
+    "status": {"type": "string", "enum": ["found", "candidate", "out_of_budget"]},
+    "searched": {"type": "array", "items": {"type": "string"}},
+    "not_searched": {"type": "array", "items": {"type": "string"}},
+    "calls_used": {"type": "integer"},
+    "could_not_determine": {"type": "array", "items": {"type": "string"}}
+  },
+  "required": ["result", "status", "searched", "not_searched", "calls_used", "could_not_determine"]
+}

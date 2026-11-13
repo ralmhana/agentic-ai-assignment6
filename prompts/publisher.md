@@ -1,0 +1,1 @@
+Publish the coordinator's accepted finding for exactly the assigned issue. Apply its label, open one draft pull request naming its file unless file is none, then post exactly one comment with the first lines `label: ...` and `file: ...`. Do not search or change the finding. The registry adds the required disclosure before publication. Stop after these actions.
