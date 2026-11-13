@@ -2,11 +2,13 @@
 from __future__ import annotations
 
 import json
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import replace
 from pathlib import PurePosixPath
 
 from agent.loop import load_bounds, run_loop
+from harness.client import tool_result
 from harness.formats import LABELS, normalize_path, parse_triage_comment
 from harness.roles import arg, role_of
 from harness.schema import errors as schema_errors
@@ -77,9 +79,43 @@ class RoleTools:
 def _investigate(ctx, worker, issue, schema, tokens):
     tools = RoleTools(ctx.tools, {"read_issue", "search", "read_file"}, issue, schema=schema)
     bounds = replace(load_bounds(), max_steps=12, max_tokens=tokens)
-    run_loop(worker.client, tools, ctx.prompt("investigator.md"),
-             f"Investigate issue #{issue}. Return one finding with label, file and concrete evidence.",
-             bounds, worker.trace)
+    messages = [{"role": "user", "content":
+                 f"Investigate issue #{issue}. Read the file you will name as responsible, "
+                 "then return one finding with label, file and concrete evidence."}]
+    started = time.monotonic()
+    step = 0
+    while tools.returned is None:
+        if step >= bounds.max_steps:
+            worker.trace.end("turn_limit", detail=f"{step} model calls without a structured return")
+            break
+        if worker.client.total_tokens >= bounds.max_tokens:
+            worker.trace.end("token_budget", detail=f"{worker.client.total_tokens} tokens")
+            break
+        if time.monotonic() - started >= bounds.wall_clock_s:
+            worker.trace.end("wall_clock", detail=f"{time.monotonic() - started:.1f}s")
+            break
+        step += 1
+        response = worker.client.create(system=ctx.prompt("investigator.md"),
+                                        messages=messages, tools=tools.schemas)
+        worker.trace.model_call(step, response)
+        messages.append(response.assistant_message())
+        if not response.tool_calls:
+            messages.append({"role": "user", "content":
+                             "Finish by calling return_finding. Use only bug, feature, question, or docs "
+                             "as the label. Name the file that needs a change, after reading it; "
+                             "a supporting file is evidence, not necessarily the responsible file. "
+                             "State uncertainty with candidate or out_of_budget instead of guessing."})
+            continue
+        results = []
+        for call in response.tool_calls:
+            result = tools.call(call.name, call.input)
+            worker.trace.tool_call(step, call, result)
+            results.append(tool_result(call, result.content, result.is_error))
+            if tools.returned is not None:
+                break
+        messages.append({"role": "user", "content": results})
+    if tools.returned is not None:
+        worker.trace.end("model_stopped", detail="structured return received")
     if tools.returned is not None:
         # The loop may make more calls after the local return tool; the recorded
         # facts must describe every actual call before coordinator receipt.
