@@ -80,8 +80,7 @@ def _investigate(ctx, worker, issue, schema, tokens):
     tools = RoleTools(ctx.tools, {"read_issue", "search", "read_file"}, issue, schema=schema)
     bounds = replace(load_bounds(), max_steps=12, max_tokens=tokens)
     messages = [{"role": "user", "content":
-                 f"Investigate issue #{issue}. Read the file you will name as responsible, "
-                 "then return one finding with label, file and concrete evidence."}]
+                 ctx.prompt("investigator_task.md").removesuffix("\n").format(issue=issue)}]
     started = time.monotonic()
     step = 0
     while tools.returned is None:
@@ -101,10 +100,7 @@ def _investigate(ctx, worker, issue, schema, tokens):
         messages.append(response.assistant_message())
         if not response.tool_calls:
             messages.append({"role": "user", "content":
-                             "Finish by calling return_finding. Use only bug, feature, question, or docs "
-                             "as the label. Name the file that needs a change, after reading it; "
-                             "a supporting file is evidence, not necessarily the responsible file. "
-                             "State uncertainty with candidate or out_of_budget instead of guessing."})
+                             ctx.prompt("investigator_retry.md").removesuffix("\n")})
             continue
         results = []
         for call in response.tool_calls:
@@ -185,7 +181,7 @@ def run(ctx) -> None:
         tools = RoleTools(ctx.tools, {"apply_label", "open_pr", "comment"}, n, finding=finding)
         coordinator.trace.event("wait", waiter="coordinator", on=publisher.id, what="publication", turn=0)
         run_loop(publisher.client, tools, ctx.prompt("publisher.md"),
-                 f"Publish issue #{n}.\nlabel: {finding['label']}\nfile: {finding['file']}\nEvidence: {finding['evidence']}",
+                 ctx.prompt("publisher_task.md").removesuffix("\n").format(**finding),
                  replace(load_bounds(), max_steps=8, max_tokens=max(1000, int((ctx.budget or 250000 * len(issues)) * .30 / len(issues)))),
                  publisher.trace)
     violations = check_combined(ctx.task, end_state(ctx.tracker, ctx.run_id, ctx.task))
